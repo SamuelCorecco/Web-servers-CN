@@ -1,7 +1,7 @@
+package Server;
+
 import java.util.HashMap;
 import java.util.Optional;
-
-import
 
 public class Request {
     private final String[] validHeaders = {

@@ -1,3 +1,5 @@
+package Server;
+
 import java.util.HashMap;
 
 public class Response {
@@ -9,6 +11,6 @@ public class Response {
     //Body
     private byte[] body;
     //the Server
-    private final Server server;
+    //private final Server server;
 
 }
