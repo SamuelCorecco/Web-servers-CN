@@ -1,6 +1,6 @@
 import java.util.HashMap;
 
-public class HTTPResponse{
+public class Response {
     // Status line
     private String version;
     private StatusCode status;
