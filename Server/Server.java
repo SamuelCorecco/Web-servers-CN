@@ -16,7 +16,7 @@ import java.io.FileNotFoundException;
 
 public class Server {
     private final ThreadPoolExecutor threadPool;
-    private HashMap<Integer,String[]> Domain;
+    private HashMap<Integer,String[]> domains;
     private ServerSocket serverSocket;
     private boolean isRun;
     private int port;
@@ -29,10 +29,11 @@ public class Server {
         this.threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
         this.port = port;
         this.isRun = false;
+        this.domains = new HashMap<>();
     }
 
     /**
-     * This function setup the server, add the ServerSocket and read the vhost.conf
+     * This function setup the server, add the ServerSocket and read the vhosts.conf
      * @return bollean, true if the server is setUp else false.
      * @throws IOException for the ServerSocket.
      */
@@ -45,23 +46,23 @@ public class Server {
         return true;
     }
     /**
-     * This function read the vhost.conf file and store the info in the server's map.
+     * This function read the vhosts.conf file and store the info in the server's map.
      */
     private void readServerHost(){
         try {
-            File VhostsFile = new File("../vhost.conf");
+            File VhostsFile = new File("vhosts.conf");
             Scanner Reader = new Scanner(VhostsFile);
             int key = 0;
             while (Reader.hasNextLine()) {
                 String line = Reader.nextLine();
                 String[] line_split = line.split(" ");
-                this.Domain.put(key, line_split);
+                this.domains.put(key, line_split);
                 key++;
                 }
             Reader.close();
         } catch (FileNotFoundException e) {
-            System.out.println("Erorr to scann file vhost :(");
             e.printStackTrace();
+            System.exit(1);
         }
     }
 
@@ -107,10 +108,10 @@ public class Server {
         if(0 > key || key > 4){
             return null;
         }
-        String returnArray[] = new String[this.Domain.size()]; 
-        for(int i = 0; i < this.Domain.size(); ++i){
-            returnArray[i] = (this.Domain.get(i))[key];
+        String returnArray[] = new String[this.domains.size()]; 
+        for(int i = 0; i < this.domains.size(); ++i){
+            returnArray[i] = (this.domains.get(i))[key];
         }
-        return this.Domain.get(key);
+        return this.domains.get(key);
     }
 }

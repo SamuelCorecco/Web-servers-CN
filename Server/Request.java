@@ -17,7 +17,6 @@ public class Request {
     private String version;
     private HashMap<String, String> headerLines;
     private byte[] body;
-    private boolean badRequest;
 
     public Request(Server server) {
         this.server = server;
@@ -27,7 +26,6 @@ public class Request {
     public boolean ParseRequestLine(final String requestLine) {
         String[] requestFields = requestLine.split(" ");
         if (requestFields.length != 3) {
-            badRequest = true;
             return false;
         } else {
             this.method = requestFields[0];
@@ -40,7 +38,6 @@ public class Request {
     public boolean ParseHeaderLines(final String headerLine) {
         String[] headerFields = headerLine.split(": ");
         if (headerFields.length < 2) {
-            badRequest = true;
             return false;
         } else {
             if(isValidHeader(headerFields[0])) {
