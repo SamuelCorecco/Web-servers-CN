@@ -58,7 +58,7 @@ public class Server {
                 String[] line_split = line.split(" ");
                 this.domains.put(key, line_split);
                 key++;
-                }
+            }
             Reader.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -102,10 +102,10 @@ public class Server {
      * key = 1 return all entry point file.
      * key = 3 return all member fullname.
      * key = 4 return all member email.
-     * @return
+     * @return the array with the information
      */
     public String[] getInfo(int key){
-        if(0 > key || key > 4){
+        if(0 > key){
             return null;
         }
         String returnArray[] = new String[this.domains.size()]; 
