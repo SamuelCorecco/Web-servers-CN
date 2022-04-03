@@ -37,7 +37,8 @@ public class Main {
 
         // Create server
         Server server = new Server(port);
-        if(server.setUp()) {
+        server.setUp();
+        if(server.isCorrectSetup()) {
             server.start();
         } else {
             error("Something went wrong when setting up server.");

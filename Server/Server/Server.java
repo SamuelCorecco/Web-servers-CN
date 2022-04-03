@@ -20,6 +20,7 @@ public class Server {
     private ServerSocket serverSocket;
     private boolean isRun;
     private int port;
+    private boolean isSetup;
 
     /**
      * Constructor for Server
@@ -34,17 +35,25 @@ public class Server {
 
     /**
      * This function setup the server, add the ServerSocket and read the vhosts.conf
-     * @return bollean, true if the server is setUp else false.
      * @throws IOException for the ServerSocket.
      */
-    public boolean setUp() throws Exception {
+    public void setUp() throws Exception {
         System.out.println("Port is " + port);
         System.out.println("Setting up server socket");
         serverSocket = new ServerSocket(port);
         readServerHost();
         System.out.println("Finished setup");
-        return true;
+        isSetup = true;
     }
+
+    /**
+     * Check if the setup is done.
+     * @return the state of setup.
+     */
+    public boolean isCorrectSetup(){
+        return this.isSetup;
+    }
+
     /**
      * This function read the vhosts.conf file and store the info in the server's map.
      */
