@@ -105,7 +105,7 @@ public class Server {
      * @return the array with the information
      */
     public String[] getInfo(int key){
-        if(0 > key){
+        if(0 > key) {
             return null;
         }
         String returnArray[] = new String[this.domains.size()]; 

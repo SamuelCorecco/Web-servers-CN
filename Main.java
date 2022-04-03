@@ -5,7 +5,7 @@ public class Main {
     
     public static void main(String[] args) throws Exception {
         
-        // TODO: Setup server and start it
+        //TODO: Setup server and start it
         
         // Parse arguments
         int port = 8080;
