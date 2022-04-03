@@ -12,9 +12,8 @@ public class Request {
             "Date"
     };
     private final Server server;
-    private String method;
-    private String URL;
-    private String version;
+    private boolean badRequest;
+    private HashMap<String, String> requestLine;
     private HashMap<String, String> headerLines;
     private byte[] body;
 
@@ -26,11 +25,12 @@ public class Request {
     public boolean ParseRequestLine(final String requestLine) {
         String[] requestFields = requestLine.split(" ");
         if (requestFields.length != 3) {
+            this.badRequest = true;
             return false;
         } else {
-            this.method = requestFields[0];
-            this.URL = requestFields[1];
-            this.version = requestFields[2];
+            this.requestLine.put("Method", requestFields[0]);
+            this.requestLine.put("URL", requestFields[1]);
+            this.requestLine.put("Version", requestFields[2]);
             return true;
         }
     }
@@ -38,12 +38,14 @@ public class Request {
     public boolean ParseHeaderLines(final String headerLine) {
         String[] headerFields = headerLine.split(": ");
         if (headerFields.length < 2) {
+            this.badRequest = true;
             return false;
         } else {
             if(isValidHeader(headerFields[0])) {
                 headerLines.computeIfAbsent(headerFields[0], k -> headerFields[1]);
             } else {
-              return false;
+                this.badRequest = true;
+                return false;
             }
         }
         return true;
@@ -68,23 +70,55 @@ public class Request {
 
     public void checkHostNotNull() {
         if (headerLines.get("Host") == null) {
-//            headerLines.put("Host", server.setDefaultHost());
-//            Questa linea e' da scommenater quando nel server verra' aggiunto un default host da passare all'HTTP 1.0 in caso di null Host.
+            headerLines.put("Host", server.getInfo(0)[0]);
         }
     }
 
+    public boolean isBodyRequired() {
+        return requestLine.get("Method").equals("PUT");
+    }
 
+    public boolean checkRequest() {
+        if (badRequest) {
+            return false;
+        }
+        if (this.requestLine.get("Version").equals("HTTP/1.1") && headerLines.get("Host").isEmpty()) {
+            this.badRequest = true;
+            return false;
+        }
+        if (this.requestLine.get("Method").equals("PUT") && this.requestLine.get("Version").equals("HTTP/1.0") && getHeaderContent("Content-Length").isEmpty()) {
+            this.badRequest = true;
+            return false;
+        }
+        if (getHeaderContent("Host").isPresent() && !server.validDomain(getHeaderContent("Host").get())) {
+            badRequest = true;
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isBadRequest() {
+        return this.badRequest;
+    }
+
+    public int getContentLength() {
+        if (headerLines.get("Content-Length") == null) {
+            return -1;
+        } else {
+            return Integer.parseInt(headerLines.get("Content-Length"));
+        }
+    }
 
     public String getMethod() {
-        return method;
+        return requestLine.get("Method");
     }
 
     public String getURL() {
-        return URL;
+        return requestLine.get("URL");
     }
 
     public String getVersion() {
-        return version;
+        return requestLine.get("Version");
     }
 
     public byte[] getBody() {
@@ -96,6 +130,11 @@ public class Request {
     }
 
     public void setURL(String URL) {
-        this.URL = URL;
+        this.requestLine.put("URL", URL);
     }
+
+    public void setHeaderField(String headerField, String headerContent) {
+        this.headerLines.put(headerField, headerContent);
+    }
+
 }
