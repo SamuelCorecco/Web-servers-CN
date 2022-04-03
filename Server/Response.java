@@ -1,6 +1,11 @@
 package Server;
 
-import java.util.HashMap;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.TimeZone;
+
 import static Server.Print.*;
 
 public class Response {
@@ -8,39 +13,117 @@ public class Response {
     private enum ResponseHeader {
         STATUS(""),DATE("Date: "),SERVER("Server: "),CLEN("Content-Length: "),
         CTYPE("Content-Type: "),CLOC("Content-Location: "),BODY("");
-        public final String s;
+        private final String s;
         private ResponseHeader(String s) {this.s = s;};
+        public String getHeader() {return this.s;}
     }
 
     private enum StatusCode {
-        OK("200 OK"),CREATED("201 Created"),BAD_REQUEST("400 Bad Request"),
-        FORBIDDEN("403 Forbidden"),NOT_FOUND("404 Not Found"),
+        OK("200 OK"),CREATED("201 Created"),NO_CONTENT("204 No Content"),
+        BAD_REQUEST("400 Bad Request"),FORBIDDEN("403 Forbidden"),NOT_FOUND("404 Not Found"),
         METHOD_NOT_ALLOWED("405 Method Not Allowed"),NOT_IMPLEMENTED("501 Not Implemented"),
         BAD_GATEWAY("502 Bad Gateway");
-        public final String s;
+        private final String s;
         private StatusCode(String s) {this.s = s;}
+        public String getStatus() {return this.s;}
     }
 
-    private HashMap<ResponseHeader, String> headers;
-    private byte[] body;
+    private LinkedHashMap<ResponseHeader, String> headers;
     private final Request request;
+
+    // TODO: Delete
+    // Dummy constructor to test responses
+    public Response() throws Exception {
+        Request q = new Request(new Server(8080));
+        q.setVersion("HTTP/1.0");
+        q.setMethod("GET");
+        this.request = q;
+        headers = new LinkedHashMap<>();
+        addStatus(StatusCode.OK);
+        addDate();
+        addServer();
+        String body = "The administrator of guyincognito.ch is Guy Incognito.\n" + 
+                        "You can contact him at guy.incognito@usi.ch.";
+        addBody(body);
+    }
 
     public Response(Request req) {
         this.request = req;
-        headers = new HashMap<>();
-        generate();
-
+        headers = new LinkedHashMap<>();
+        handle();
     }
 
     /**
-     * Generates the appropiate response based on the request.
+     * Get current time to include in "Date" header.
+     * Code taken from: https://stackoverflow.com/questions/7707555/getting-date-in-http-format-in-java
+     * @return current date and time in the HTTP format
      */
-    public void generate() {
+    private String getCurrentTime() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+            "EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return dateFormat.format(Calendar.getInstance().getTime());
+    }
+
+    // ===== Response populating (Auxiliary) =====
+
+    /**
+     * Add status-line header
+     * Used: All methods
+     * @param status status code
+     */
+    private void addStatus(StatusCode status) {
+        headers.put(ResponseHeader.STATUS, this.request.getVersion() + " " + status.getStatus());
+    }
+
+    /**
+     * Add current date and time to response
+     * Used: GET, DELETE, NTW22INFO
+     */
+    private void addDate() {
+        headers.put(ResponseHeader.DATE, getCurrentTime());
+    }
+
+    /**
+     * Add server header
+     * Used: All methods
+     */
+    private void addServer() {
+        headers.put(ResponseHeader.SERVER, "Up in the Clouds");
+    }
+
+    /**
+     * Add Content-Length, Type, and Body to response
+     * Used: GET
+     * @param body message to answer to client
+     */
+    private void addBody(String body) {
+        String len = Integer.toString(body.length());
+        headers.put(ResponseHeader.CLEN, len);
+        headers.put(ResponseHeader.CTYPE, "text/plain");
+        headers.put(ResponseHeader.BODY, body);
+    }
+
+    /**
+     * Add content location header
+     * Used: PUT
+     */
+    private void addContentLocation() {
+        // TODO
+    }
+        
+
+    /**
+     * Populates the response object with the appropiate headers and information
+     * depending on the request.
+     */
+    private void handle() {
         switch (this.request.getMethod()) {
             case "GET":
                 answerGet();
                 break;
             default:
+                // TODO: Give correct status code.
                 error("Unknown request method");
                 break;
         }
@@ -85,11 +168,6 @@ public class Response {
         return null;
     }
 
-    private String getServerName() {
-        //TODO
-        return null;
-    }
-
     // ===== Request Type Handling =====
 
     /**
@@ -116,17 +194,34 @@ public class Response {
         //TODO
     }
 
-    // Testing Purposes
-    public String toString() {
+    /**
+     * Convert the String representation of the response into a byte array.
+     * @return byte array of HTTP response
+     */
+    public byte[] toByteArray() {
+        return responseToString().getBytes();
+    }
+
+    /**
+     * Prints formatted response to terminal.
+     */
+    public void printResponseInfo() {
+        print(this.responseToString());
+    }
+
+    /**
+     * Convert the Response object to a well formatted string.
+     * @return response in string format
+     */
+    private String responseToString() {
         String response = "";
         for(ResponseHeader h : headers.keySet()) {
-            String line = h.s +  headers.get(h) + "\n";
+            String line = h.getHeader() +  headers.get(h) + "\r\n";
             if(h == ResponseHeader.BODY) {
-                line = "\n" + line; // CRLF
+                line = "\r\n" + line; // CRLF
             }
-            response.concat(line);
+            response += line;
         }
         return response;
     }
-
 }
