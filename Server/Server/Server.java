@@ -114,7 +114,7 @@ public class Server {
      * @return the array with the information
      */
     public String[] getInfo(int key){
-        if(0 > key) {
+        if(0 > key){
             return null;
         }
         String returnArray[] = new String[this.domains.size()]; 
@@ -123,4 +123,15 @@ public class Server {
         }
         return this.domains.get(key);
     }
+    
+    public boolean validDomain(String Host){
+        String[] ArrDomain = getInfo(0);
+        for(int i = 0; i < ArrDomain.length; ++i){
+            if(ArrDomain[i].equals(Host)){
+                return true;
+            }
+        }
+        return false;
+    }
 }
+
