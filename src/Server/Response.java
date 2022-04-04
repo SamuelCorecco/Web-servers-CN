@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import static Server.Server.Print.*;
+import static Server.Print.*;
 
 public class Response {
 
