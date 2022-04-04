@@ -1,4 +1,4 @@
-package Server.Server;
+package Server;
 
 public enum StatusCode {
     OK("200 OK"), CREATED("201 CREATED"), BAD_REQUEST("400 BAD REQUEST"), FORBIDDEN("403 FORBIDDEN"),

@@ -1,4 +1,4 @@
-package Server.Server;
+package Server;
 
 public class Print {
     

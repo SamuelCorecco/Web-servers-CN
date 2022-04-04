@@ -1,4 +1,4 @@
-package Server.Server;
+package Server;
 
 import java.io.IOException;
 import java.nio.file.*;

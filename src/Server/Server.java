@@ -1,5 +1,5 @@
 // Read FILE 
-package Server.Server;
+package Server;
 
 import static Server.Server.Print.*;
 import java.net.*;
