@@ -1,4 +1,4 @@
-package Server.Server;
+package Server;
 
 import java.util.HashMap;
 import java.util.Optional;
@@ -19,8 +19,8 @@ public class Request {
 
     public Request(Server server) {
         this.server = server;
-        this.headerLines = new HashMap<>();
         this.requestLine = new HashMap<>();
+        this.headerLines = new HashMap<>();
     }
 
     public boolean ParseRequestLine(final String requestLine) {
@@ -118,6 +118,14 @@ public class Request {
         return requestLine.get("URL");
     }
 
+    /**
+     * Get the request's specified Host.
+     */
+    public String getHost() {
+        checkHostNotNull();
+        return headerLines.get("Host");
+    }
+
     public String getVersion() {
         return requestLine.get("Version");
     }
@@ -151,11 +159,6 @@ public class Request {
     // TODO: Delete
     public void setHost(String h) {
         this.headerLines.put("Host",h);
-    }
-
-    public String getHost() {
-        checkHostNotNull();
-        return headerLines.get("Host");
     }
 
 }

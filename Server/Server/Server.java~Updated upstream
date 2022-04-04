@@ -1,7 +1,7 @@
 // Read FILE 
-package Server.Server;
+package Server;
 
-import static Server.Server.Print.*;
+import static Server.Print.*;
 import java.net.*;
 import java.io.File; 
 import java.util.Scanner;
@@ -9,9 +9,11 @@ import java.util.Scanner;
 import java.util.HashMap;
 //Thread
 import java.util.concurrent.ThreadPoolExecutor;
+
 import java.util.concurrent.Executors;
 //Exeption
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.FileNotFoundException;
 
@@ -87,7 +89,7 @@ public class Server {
             try{
                 Socket ClientSocket = this.serverSocket.accept();
                 print("Connection from: " + ClientSocket.getInetAddress() + " established.");
-                //InputStream s_input = ClientSocket.getInputStream();
+                InputStream s_input = ClientSocket.getInputStream();
                 OutputStream s_output = ClientSocket.getOutputStream();
 
                 // String line = readLineOfBytes(s_input);
@@ -127,9 +129,21 @@ public class Server {
      * @param hostname host of which we want to get the entry file
      * @return name of the entry point file, inside the corresponding <member_name> folder
      */
+<<<<<<< Updated upstream:Server/Server/Server.java
+    public String[] getInfo(int key){
+        if(0 > key){
+            return null;
+        }
+        String returnArray[] = new String[this.domains.size()]; 
+        for(int i = 0; i < this.domains.size(); ++i){
+            returnArray[i] = (this.domains.get(i))[key];
+        }
+        return this.domains.get(key);
+=======
     public String getEntryPoint(String hostname) {
 
-        readServerHost(); //TODO: Delete (used for testing)
+        //TODO: Delete (used for testing)
+        readServerHost();
 
         return domains.getEntryPoint(hostname);
     }
@@ -139,6 +153,17 @@ public class Server {
      */
     public String getDefaultHost() {
         return domains.getDefaultHostname();
+>>>>>>> Stashed changes:Server/Server.java
+    }
+    
+    public boolean validDomain(String Host){
+        String[] ArrDomain = getInfo(0);
+        for(int i = 0; i < ArrDomain.length; ++i){
+            if(ArrDomain[i].equals(Host)){
+                return true;
+            }
+        }
+        return false;
     }
 }
 
