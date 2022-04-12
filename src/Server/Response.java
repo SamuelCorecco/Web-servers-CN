@@ -34,8 +34,7 @@ public class Response {
     private final Request request;
     private final Server server;
 
-    // TODO: Delete
-    // Dummy constructor to test responses
+     // Dummy constructor to test responses
     public Response() throws Exception {
         this.server = new Server(8080);
         Request q = new Request(this.server);
@@ -198,6 +197,9 @@ public class Response {
      */
     private String getFileExtension(String fileName) {
         final String ext = fileName.split("\\.")[1];
+        FileHandler fileHandler = new  FileHandler();
+        return fileHandler.extensionToMimeType(ext);
+        /*
         String ctype;
         switch (ext) {
             case "html":
@@ -216,11 +218,12 @@ public class Response {
                 ctype = "text/plain";
                 break;
         }
-        return ctype;
+        return ctype;*/
     }
 
     /**
      * Returns the contents of an HTML file in String format.
+     * @param path the par
      * @return text inside HTML file
      */
     private String getFileContent(Path path){

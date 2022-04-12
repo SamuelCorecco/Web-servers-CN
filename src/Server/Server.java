@@ -140,5 +140,13 @@ public class Server {
     public String getDefaultHost() {
         return domains.getDefaultHostname();
     }
+
+
+    /**
+     * Get default hostname in case the Host header is not specified in a request.
+     */
+    public Boolean validDomain(String checkDomain) {
+        return (0 <= domains.checkHostExists(checkDomain));
+    }
 }
 

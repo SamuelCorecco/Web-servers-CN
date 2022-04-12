@@ -71,7 +71,8 @@ public class Request {
      */
 
     public boolean isValidHeader(String header) {
-        for (String validHeader: validHeaders) {
+        for (int i = 0; i < validHeaders.length; ++i) {
+            String validHeader = validHeaders[i];
             if (validHeader.equals(header)) {
                 return true;
             }
@@ -133,10 +134,10 @@ public class Request {
             this.badRequest = true;
             return false;
         }
-//         if (getHeaderContent("Host").isPresent() && !server.validDomain(getHeaderContent("Host").get())) {
-//             badRequest = true;
-//             return false;
-//         }
+         if (getHeaderContent("Host").isPresent() && !server.validDomain(getHeaderContent("Host").get())) {
+             badRequest = true;
+             return false;
+         }
         return true;
     }
 
@@ -252,6 +253,10 @@ public class Request {
             checkHostNotNull();
         }
         return headerLines.get("Host");
+    }
+
+    public boolean getBadRequest() {
+        return badRequest;
     }
 
 }

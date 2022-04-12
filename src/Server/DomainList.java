@@ -22,7 +22,7 @@ public class DomainList {
      * @param hostname
      * @return index of host if it exists, -1 if not
      */
-    private int checkHostExists(String hostname) {
+    public int checkHostExists(String hostname) {
         for(int i = 0; i < domains.size(); i++) {
             Domain d = domains.get(i);
             if(d.getDomainName().equals(hostname)) {
