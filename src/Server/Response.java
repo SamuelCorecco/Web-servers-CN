@@ -270,7 +270,7 @@ public class Response {
      * Convert the Response object to a well formatted string.
      * @return response in string format
      */
-    private String responseToString() {
+    public String responseToString() {
         String response = "";
         for(ResponseHeader h : headers.keySet()) {
             String line = h.getHeader() +  headers.get(h) + "\r\n";
@@ -280,5 +280,16 @@ public class Response {
             response += line;
         }
         return response;
+    }
+
+    //TODO: implementare il fatto che ritorna lo stato in stringa
+    public String getStatusString(){
+        return "TODO";
+    }
+
+    //TODO: implementare un parametro che dica se il messaggio è l'ultimo
+    public Boolean getIsLast(){
+        //EX return this.last
+        return true;
     }
 }

@@ -21,10 +21,9 @@ public class ThreadSocket implements Runnable{
         Response response;
         do {
             request = new Request(server);
-            response = new Response(server); //TODO constructor of Response should take a server
             InputStream in = socket.getInputStream();
             OutputStream out = socket.getOutputStream();
-            String requestLine = readByteStream(input);
+            String requestLine = readByteStream(in);
             if (request.ParseRequestLine(requestLine)) {
                 while(!(requestLine.equals(""))) {
                     request.ParseHeaderLines(requestLine);
@@ -34,11 +33,11 @@ public class ThreadSocket implements Runnable{
                 byte[] body = in.readNBytes(request.getContentLength());
                 request.setBody(body);
             }
-            response = new Response(server).handleRequest(request); //TODO implement a handlerequest method in Repsonse class
-            out.write(response.toStringMod()); //TODO implement a toString function that returns a byte[] in Response class
+            response = new Response(request,server); 
+            out.write(response.responseToString().getBytes());
             out.flush();
-            System.out.println(response.getStatus() + " " + request.getMethod() + " " +request.getURL() + " " + request.getVersion());//TODO getStatus for respons
-        } while (!response.isLast()); //TODO implement method isLast
+            System.out.println(response.getStatusString() + " " + request.getMethod() + " " +request.getURL() + " " + request.getVersion());//TODO getStatus for respons
+        } while (!response.getIsLast()); //TODO implement method isLast
         socket.close(); //
     }
 
