@@ -8,10 +8,20 @@ public class DomainList {
     
     private final List<Domain> domains;
 
+    /**
+     * Initialise the domain list
+     */
     public DomainList() {
         this.domains = new ArrayList<>();
     }
 
+    /**
+     * Add a domain
+     * @param hostname hostname
+     * @param entryPointFile entry file for the given host (eg: home.html)
+     * @param memberName full name of member
+     * @param memberEmail email of member
+     */
     public void addDomain(String hostname, String entryPointFile, String memberName, String memberEmail) {
         Domain d = new Domain(hostname, entryPointFile, memberName, memberEmail);
         domains.add(d);
@@ -46,6 +56,11 @@ public class DomainList {
         }
     }
 
+    /**
+     * Get member name of the given host
+     * @param hostname hostname
+     * @return member name
+     */
     public String getMemberName(String hostname) {
         int idx = checkHostExists(hostname);
         if(idx > 0) {
@@ -55,6 +70,11 @@ public class DomainList {
         }
     }
 
+    /**
+     * Get email associated with a given hostname
+     * @param hostname hostname
+     * @return email
+     */
     public String getMemberEmail(String hostname) {
         int idx = checkHostExists(hostname);
         if(idx > 0) {
@@ -66,10 +86,18 @@ public class DomainList {
 
     // === Default Host ===
 
+    /**
+     * Get default hostname
+     * @return hostname
+     */
     public String getDefaultHostname() {
         return domains.get(0).getDomainName();
     }
 
+    /**
+     * Get the entry point file of the default host
+     * @return path to file
+     */
     public String getDefaultEntryPointFile() {
         return domains.get(0).getEntryPointFile();
     }
@@ -83,6 +111,9 @@ public class DomainList {
         }
     }
 
+    /**
+     * Print list of domains with their information
+     */
     public void printDomainList() {
         for(int i = 0; i < domains.size(); i++) {
             String d = domains.get(i).getDomainName();
@@ -98,6 +129,13 @@ public class DomainList {
         private final String memberFullName;
         private final String memberEmail;
     
+        /**
+         * Constructor for domain
+         * @param name domain name
+         * @param entryPointFile entry point file of host
+         * @param memberName member name
+         * @param email member email
+         */
         public Domain(String name, String entryPointFile, String memberName, String email) {
             this.domainName = name;
             this.entryPointFile = entryPointFile;
@@ -105,18 +143,34 @@ public class DomainList {
             this.memberEmail = email;
         }
     
+        /**
+         * Get domain name 
+         * @return name
+         */
         public String getDomainName() {
             return domainName;
         }
     
+        /**
+         * Get entry point file of domain
+         * @return filename
+         */
         public String getEntryPointFile() {
             return entryPointFile;
         }
     
+        /**
+         * Get member name
+         * @return name
+         */
         public String getMemberName() {
             return memberFullName;
         }
     
+        /**
+         * Get member email
+         * @return email
+         */
         public String getMemberEmail() {
             return memberEmail;
         }
