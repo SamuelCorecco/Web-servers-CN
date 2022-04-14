@@ -24,7 +24,13 @@ public class Main {
 
             } else if(command.equals("-help")) {
                 // TODO: Print help
-                print("Here's some help!");
+                print("== Server Settings ==");
+                print("To set a port, run with -port=<port_number>");
+                print("you can serch site write 'namesurname.ch' example 'andreaprato.ch:8080'");
+                print("If the server doesn't work, try running 'sudo nano /etc/hosts' and write '127.0.0.1 namesurname.ch' under localhost");
+                print("");
+                print(" == Supported HTTP methods == ");
+                print("GET, PUT, DELETE, NTW22INFO");
 
             } else {
                 error("Unknown command");
