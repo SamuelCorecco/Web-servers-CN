@@ -1,4 +1,4 @@
-package Server;
+package src.Server;
 
 import java.io.File;
 import java.io.FileNotFoundException;

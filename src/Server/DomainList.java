@@ -1,8 +1,8 @@
-package Server;
+package src.Server;
 
 import java.util.ArrayList;
 import java.util.List;
-import static Server.Print.*;
+import static src.Server.Print.*;
 
 public class DomainList {
     

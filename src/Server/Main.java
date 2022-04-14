@@ -1,5 +1,5 @@
-import Server.Server;
-import static Server.Print.*;
+package src.Server;
+import static src.Server.Print.*;
 
 public class Main {
     

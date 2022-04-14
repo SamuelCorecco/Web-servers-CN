@@ -1,7 +1,7 @@
 // Read FILE 
-package Server;
+package src.Server;
 
-import static Server.Print.*;
+import static src.Server.Print.*;
 import java.net.*;
 import java.io.File; 
 import java.util.Scanner;

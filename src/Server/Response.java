@@ -1,4 +1,4 @@
-package Server;
+package src.Server;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import static Server.Print.*;
+import static src.Server.Print.*;
 
 public class Response {
 
