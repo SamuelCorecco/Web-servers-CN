@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 import static java.util.Map.entry;
+import static src.Server.Print.*;
 
 public class FileHandler {
     //This is the server path.
@@ -100,6 +101,7 @@ public class FileHandler {
 
     public static boolean checkFileExists(String host, String URL) {
         File file = new File(serverPath, host + "/" + URL);
+        // print(file.getAbsolutePath());
         return file.exists();
     }
 

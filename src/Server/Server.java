@@ -70,24 +70,17 @@ public class Server {
         }
     }
 
-    /**
-     * Print a line of the request to the terminal. For testing purposes
-     * @param input input stream of request
-     * @return line of the request
-     * @throws IOException
-     */
-    private String readLineOfBytes(InputStream input) throws IOException {
-        ByteArrayOutputStream bStream = new ByteArrayOutputStream();
-        int b = input.read();
-        int c = input.read();
-        while (!(b == '\r' && c == '\n')) {
-            bStream.write(b);
-            b = c;
-            c = input.read();
-                 }
-        System.out.println(bStream.toString());
-        return bStream.toString();
-    }
+    // /**
+    //  * Print request to terminal
+    //  * @param s_input input stream of request
+    //  */
+    // public void printRequestToTerminal(InputStream s_input) throws IOException {
+    //     print("");
+    //     String line;
+    //     do {
+    //         line = readLineOfBytes(s_input);
+    //     } while (!line.equals(""));
+    // }
 
     /**
      * this function start the server on the server's port number.
@@ -101,22 +94,18 @@ public class Server {
             try{
                 Socket ClientSocket = this.serverSocket.accept();
                 print("Connection from: " + ClientSocket.getInetAddress() + " established.");
-                //this.threadPool.submit(new ThreadSocket(ClientSocket, this));
-                InputStream s_input = ClientSocket.getInputStream();
-                OutputStream s_output = ClientSocket.getOutputStream();
+                this.threadPool.submit(new ThreadSocket(ClientSocket, this));
+                // InputStream s_input = ClientSocket.getInputStream();
+                // OutputStream s_output = ClientSocket.getOutputStream();
 
-                print("");
-                String line;
-                do {
-                    line = readLineOfBytes(s_input);
-                } while (!line.equals(""));
+                // printRequestToTerminal(s_input);
 
-                Response r = new Response(); //TODO: DELETE
-                r.printResponseInfo();
-                s_output.write(r.toByteArray());
+                // Response r = new Response(); //TODO: DELETE
+                // r.printResponseInfo();
+                // s_output.write(r.toByteArray());
 
-                System.out.println("Connection with " + ClientSocket.getInetAddress() + " is now closed.\n");
-                ClientSocket.close();
+                // System.out.println("Connection with " + ClientSocket.getInetAddress() + " is now closed.\n");
+                // ClientSocket.close();
                 //this.threadPool.submit();*/
 
             } catch (IOException e) {

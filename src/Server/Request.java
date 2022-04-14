@@ -51,15 +51,22 @@ public class Request {
 
     public boolean ParseHeaderLines(final String headerLine) {
         String[] headerFields = headerLine.split(": ");
-        if (headerFields.length < 2) {
+        if (headerFields.length != 2) {
             this.badRequest = true;
             return false;
         } else {
             if(isValidHeader(headerFields[0])) {
-                headerLines.computeIfAbsent(headerFields[0], k -> headerFields[1]);
+                if(headerFields[0].equals("Host")) {
+                    headerLines.put("Host", headerFields[1].split(":")[0]);
+                } else {
+                    headerLines.computeIfAbsent(headerFields[0], k -> headerFields[1]);
+                }
             } else {
-                this.badRequest = true;
-                return false;
+                //TODO: ERROR
+                // headerLine = Accept: image/avif,image/webp,*/*
+                // headerFields[0] = Accept
+                //this.badRequest = true;
+                //NO bad request se non conosci l'header
             }
         }
         return true;
@@ -136,7 +143,7 @@ public class Request {
             return false;
         }
          if (getHeaderContent("Host").isPresent() && !server.validDomain(getHeaderContent("Host").get())) {
-             badRequest = true;
+                badRequest = true;
              return false;
          }
         return true;

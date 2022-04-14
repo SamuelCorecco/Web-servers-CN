@@ -24,7 +24,7 @@ public class Response {
         OK("200 OK"),CREATED("201 Created"),NO_CONTENT("204 No Content"),
         BAD_REQUEST("400 Bad Request"),FORBIDDEN("403 Forbidden"),NOT_FOUND("404 Not Found"),
         METHOD_NOT_ALLOWED("405 Method Not Allowed"),INTERNAL_SERVER_ERROR("500 Internal Server Error"),NOT_IMPLEMENTED("501 Not Implemented"),
-        BAD_GATEWAY("502 Bad Gateway");
+        HTTP_VERSION_NOT_SUPPORTED("505 HTTP Version Not Supported");
         private final String s;
         private StatusCode(String s) {this.s = s;}
         public String getStatus() {return this.s;}
@@ -36,21 +36,21 @@ public class Response {
     private final Server server;
     private boolean isLast; 
 
-     // TODO: DELETE Dummy constructor to test responses
-    public Response() throws Exception {
-        this.isLast = true;
-        this.server = new Server(8080);
-        Request req = new Request(this.server);
-        req.setVersion("HTTP/1.0");
-        req.setMethod("PUT");
-        req.setURL("/newfile.html");
-        req.setHost("samuelcorecco.ch");
-        String reqbodystring = new String("<html><body><h1>Hello!</h1></body></html>");
-        req.setBody(reqbodystring.getBytes());
-        this.request = req;
-        headers = new LinkedHashMap<>();
-        handle();
-    }
+    //  // TODO: DELETE Dummy constructor to test responses
+    // public Response() throws Exception {
+    //     this.isLast = true;
+    //     this.server = new Server(8080);
+    //     Request req = new Request(this.server);
+    //     req.setVersion("HTTP/1.0");
+    //     req.setMethod("PUT");
+    //     req.setURL("/newfile.html");
+    //     req.setHost("samuelcorecco.ch");
+    //     String reqbodystring = new String("<html><body><h1>Hello!</h1></body></html>");
+    //     req.setBody(reqbodystring.getBytes());
+    //     this.request = req;
+    //     headers = new LinkedHashMap<>();
+    //     handle();
+    // }
 
     /**
      * Creates a new Response for the given Server and Request, AND handles it, ie, it is
@@ -131,6 +131,9 @@ public class Response {
      * depending on the request.
      */
     private void handle() {
+        if(!errorCheck()) {
+            return;
+        }
         switch (this.request.getMethod()) {
             case "GET":
                 answerGet();
@@ -159,10 +162,11 @@ public class Response {
     private void answerGet() {
         String request_host = this.request.getHost();
         String request_resource = this.request.getURL();
-        if(request_resource == "/") {
+        if(request_resource.equals("/")) {
             request_resource =  server.getEntryPoint(request_host);
         }
         String filePath = request_host + "/" + request_resource;
+        // print("filepath is: " + filePath);
 
         if(FileHandler.checkFileExists(request_host, request_resource)) {
             try {
@@ -248,7 +252,7 @@ public class Response {
             byte[] body = bodyContent.getBytes();
             addBody(body, "text/plain");
         } else {
-
+            addStatus(StatusCode.NOT_FOUND);
         }
     }
 
@@ -306,5 +310,25 @@ public class Response {
      */
     public String getStatusString() {
         return headers.get(ResponseHeader.STATUS);
+    }
+
+    /**
+     * General check method for setting error statuses
+     * @return whether errors were found (false) or the request is good (true)
+     */
+    public boolean errorCheck() {
+        boolean isGood = false;
+        if (request.isBadRequest()) {
+            addStatus(StatusCode.BAD_REQUEST); // 400
+        } else if (!request.getVersion().equals("HTTP/1.0") && !request.getVersion().equals("HTTP/1.1")) {
+            addStatus(StatusCode.HTTP_VERSION_NOT_SUPPORTED); // 505
+        } else if (!FileHandler.validPermission(request.getHost(), request.getURL())) {
+            addStatus(StatusCode.FORBIDDEN); // 403
+            addDate();
+        } else {
+            isGood = true;
+        }
+        this.isLast = !isGood;
+        return isGood;
     }
 }
