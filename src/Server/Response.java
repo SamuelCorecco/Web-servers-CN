@@ -35,23 +35,7 @@ public class Response {
     private final Request request;
     private final Server server;
     private boolean isLast; 
-
-    //  // TODO: DELETE Dummy constructor to test responses
-    // public Response() throws Exception {
-    //     this.isLast = true;
-    //     this.server = new Server(8080);
-    //     Request req = new Request(this.server);
-    //     req.setVersion("HTTP/1.0");
-    //     req.setMethod("PUT");
-    //     req.setURL("/newfile.html");
-    //     req.setHost("samuelcorecco.ch");
-    //     String reqbodystring = new String("<html><body><h1>Hello!</h1></body></html>");
-    //     req.setBody(reqbodystring.getBytes());
-    //     this.request = req;
-    //     headers = new LinkedHashMap<>();
-    //     handle();
-    // }
-
+    
     /**
      * Creates a new Response for the given Server and Request, AND handles it, ie, it is
      * populated with the correct information to then turn it into a byte array.

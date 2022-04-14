@@ -92,21 +92,10 @@ public class Server {
         while(this.isRun) {
             print("Waiting for connection...");
             try{
+                
                 Socket ClientSocket = this.serverSocket.accept();
                 print("Connection from: " + ClientSocket.getInetAddress() + " established.");
                 this.threadPool.submit(new ThreadSocket(ClientSocket, this));
-                // InputStream s_input = ClientSocket.getInputStream();
-                // OutputStream s_output = ClientSocket.getOutputStream();
-
-                // printRequestToTerminal(s_input);
-
-                // Response r = new Response(); //TODO: DELETE
-                // r.printResponseInfo();
-                // s_output.write(r.toByteArray());
-
-                // System.out.println("Connection with " + ClientSocket.getInetAddress() + " is now closed.\n");
-                // ClientSocket.close();
-                //this.threadPool.submit();*/
 
             } catch (IOException e) {
                 error("Socket error");

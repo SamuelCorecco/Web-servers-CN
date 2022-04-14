@@ -37,6 +37,10 @@ public class ThreadSocket implements Runnable{
         return bStream.toString();
     }
 
+    /**
+     * Handles a request
+     * @throws IOException
+     */
     private void handleRequest() throws IOException {
         Response response;
         do {
@@ -62,18 +66,6 @@ public class ThreadSocket implements Runnable{
             // System.out.println(response.getStatusString() + " " + request.getMethod() + " " +request.getURL() + " " + request.getVersion());//TODO getStatus for respons
         } while (!response.getIsLast() || request.getVersion().equals("HTTP/1.0")); 
         socket.close(); 
-    }
-
-    private String readByteStream(InputStream in) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        int first = in.read();
-        int second = in.read();
-        while (first != '\r' || second != '\n') {
-            baos.write(first);
-            first = second;
-            second = in.read();
-        }
-        return baos.toString();
     }
 
     @Override

@@ -5,8 +5,6 @@ public class Main {
     
     public static void main(String[] args) throws Exception {
         
-        //TODO: Setup server and start it
-        
         // Parse arguments
         int port = 8080;
         
@@ -17,12 +15,10 @@ public class Main {
         if(args.length == 1) {
             String command = args[0];
             if(command.startsWith("-port=")) {
-                // TODO: Set new port
                 try {
                     port = Integer.parseInt(args[0].substring(6));
                     print(port);
                 } catch (NumberFormatException e) {
-                    //TODO: handle exception
                     error("No port number specified");
                 }
 

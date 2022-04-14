@@ -26,6 +26,11 @@ public class FileHandler {
             entry("png", "image/png")
     );
 
+    /**
+     * Get mime type of a file
+     * @param filename filename
+     * @return mime type in the correct format
+     */
     public static String getMimeType(String filename) {
         String ext = getFileExtension(filename);
         return extensionToMimeType(ext);

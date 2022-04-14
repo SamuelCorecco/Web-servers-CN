@@ -18,6 +18,10 @@ public class Request {
     private HashMap<String, String> headerLines;
     private byte[] body;
 
+    /**
+     * Request constructor
+     * @param server server to which this request belongs
+     */
     public Request(Server server) {
         this.server = server;
         this.headerLines = new HashMap<>();
@@ -241,21 +245,6 @@ public class Request {
         this.headerLines.put(headerField, headerContent);
     }
 
-    // TODO: Delete
-    public void setVersion(String v) {
-        this.requestLine.put("Version",v);
-    }
-
-    // TODO: Delete
-    public void setMethod(String m) {
-        this.requestLine.put("Method",m);
-    }
-
-    // TODO: Delete
-    public void setHost(String h) {
-        this.headerLines.put("Host",h);
-    }
-
     /**
      * It retrieves the Host header value, if the HTTP version is 1.0, we set the default Host value if there is not a current value.
      * @return the String representing the Host header value
@@ -268,6 +257,10 @@ public class Request {
         return headerLines.get("Host");
     }
 
+    /**
+     * Check whether request is bad
+     * @return if request is bad (true) or not (false)
+     */
     public boolean getBadRequest() {
         return badRequest;
     }
