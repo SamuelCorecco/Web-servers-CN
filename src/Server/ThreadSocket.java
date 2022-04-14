@@ -63,7 +63,6 @@ public class ThreadSocket implements Runnable{
             response.printResponseInfo();
             out.write(response.toByteArray());
             out.flush();
-            // System.out.println(response.getStatusString() + " " + request.getMethod() + " " +request.getURL() + " " + request.getVersion());//TODO getStatus for respons
         } while (!response.getIsLast() || request.getVersion().equals("HTTP/1.0")); 
         socket.close(); 
     }

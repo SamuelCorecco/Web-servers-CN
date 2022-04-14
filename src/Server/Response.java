@@ -35,7 +35,7 @@ public class Response {
     private final Request request;
     private final Server server;
     private boolean isLast; 
-    
+
     /**
      * Creates a new Response for the given Server and Request, AND handles it, ie, it is
      * populated with the correct information to then turn it into a byte array.
@@ -178,7 +178,7 @@ public class Response {
     private void answerPut() {
         String request_host = this.request.getHost();
         String request_resource = this.request.getURL();
-        if(request_resource == "/") {
+        if(request_resource.equals("/")) {
             request_resource =  server.getEntryPoint(request_host);
         }
 

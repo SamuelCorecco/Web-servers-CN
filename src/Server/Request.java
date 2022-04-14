@@ -7,8 +7,8 @@ import static src.Server.Print.*;
 public class Request {
     private final String[] validHeaders = {
             "Connection",
-            "Content-length",
-            "Content-type",
+            "Content-Length",
+            "Content-Type",
             "Host",
             "Date"
     };
@@ -65,12 +65,6 @@ public class Request {
                 } else {
                     headerLines.computeIfAbsent(headerFields[0], k -> headerFields[1]);
                 }
-            } else {
-                //TODO: ERROR
-                // headerLine = Accept: image/avif,image/webp,*/*
-                // headerFields[0] = Accept
-                //this.badRequest = true;
-                //NO bad request se non conosci l'header
             }
         }
         return true;
@@ -169,6 +163,7 @@ public class Request {
 
     public int getContentLength() {
         if (headerLines.get("Content-Length") == null) {
+            print("content lenght is -1");
             return -1;
         } else {
             int len = Integer.parseInt(headerLines.get("Content-Length"));
@@ -218,11 +213,10 @@ public class Request {
      */
 
     public void setBody(byte[] body) {
-        // TODO: Delete everything except last line
         this.headerLines.put("Content-Type", "text/html"); // TODO: handle other types
         String len = Integer.toString(new String(body).length());
         this.headerLines.put("Content-Length", len);
-        this.body = body;
+        this.body = new String("fuck").getBytes();
     }
 
     /**

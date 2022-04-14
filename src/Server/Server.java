@@ -119,9 +119,6 @@ public class Server {
      * @return name of the entry point file, inside the corresponding <member_name> folder
      */
     public String getEntryPoint(String hostname) {
-
-        readServerHost(); //TODO: Delete (used for testing)
-
         return domains.getEntryPoint(hostname);
     }
 
