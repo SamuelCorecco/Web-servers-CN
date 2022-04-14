@@ -38,7 +38,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .sec {
     margin: 0px 100px;
-    max-width: 750px;
+    width: 750px;
     margin-bottom: 60px;
 }
 

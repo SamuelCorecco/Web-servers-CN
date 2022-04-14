@@ -155,17 +155,12 @@ public class Response {
      * Handles a GET request
      */
     private void answerGet() {
-        //TODO
         String request_host = this.request.getHost();
-        //print("Host is " + request_host);
         String request_resource = this.request.getURL();
         if(request_resource == "/") {
             request_resource =  server.getEntryPoint(request_host);
         }
         String filePath = request_host + "/" + request_resource;
-
-        print("");
-        print("requested: " + filePath);
 
         if(FileHandler.checkFileExists(request_host, request_resource)) {
             try {
@@ -192,6 +187,12 @@ public class Response {
      */
     private void answerPut() {
         //TODO
+        String request_host = this.request.getHost();
+        String request_resource = this.request.getURL();
+        if(request_resource == "/") {
+            request_resource =  server.getEntryPoint(request_host);
+        }
+        String filePath = request_host + "/" + request_resource;
     }
 
     private void answerDelete() {
