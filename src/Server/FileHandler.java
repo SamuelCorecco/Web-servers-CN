@@ -25,6 +25,11 @@ public class FileHandler {
             entry("png", "image/png")
     );
 
+    public static String getMimeType(String filename) {
+        String ext = getFileExtension(filename);
+        return extensionToMimeType(ext);
+    }
+
     /**
      * It returns the MIME type of the extension.
      * @param extension is a String representing the extension of the file
@@ -82,7 +87,7 @@ public class FileHandler {
      */
 
     public static byte[] getFileContent(String host, String URL) throws IOException {
-        String requestedFileName = serverPath + "/" + host + URL;
+        String requestedFileName = serverPath + "/" + host + "/" + URL;
         return Files.readAllBytes(Paths.get(requestedFileName));
     }
 
@@ -93,8 +98,8 @@ public class FileHandler {
      * @return true if the file exists, false otherwise
      */
 
-    public static boolean existingFile(String host, String URL) {
-        File file = new File(serverPath, host + URL);
+    public static boolean checkFileExists(String host, String URL) {
+        File file = new File(serverPath, host + "/" + URL);
         return file.exists();
     }
 
@@ -106,11 +111,7 @@ public class FileHandler {
 
     public static String getFileExtension(String URL) {
         String[] splitURL = URL.split("\\.");
-        if (URL.equals("/")) {
-            return "text/html";
-        } else {
-            return splitURL[splitURL.length - 1];
-        }
+        return splitURL[splitURL.length - 1];
     }
 
     /**

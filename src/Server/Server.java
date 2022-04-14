@@ -5,15 +5,11 @@ import static Server.Print.*;
 import java.net.*;
 import java.io.File; 
 import java.util.Scanner;
-//Mappa
-import java.util.HashMap;
 //Thread
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.Executors;
 //Exeption
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 
 public class Server {
     private final ThreadPoolExecutor threadPool;
@@ -74,6 +70,24 @@ public class Server {
         }
     }
 
+    // /**
+    //  * Print a line of the request to the terminal. For testing purposes
+    //  * @param input input stream of request
+    //  * @return line of the request
+    //  * @throws IOException
+    //  */
+    // private String readLineOfBytes(InputStream input) throws IOException {
+    //     ByteArrayOutputStream bStream = new ByteArrayOutputStream();
+    //     int b = input.read();
+    //     int c = input.read();
+    //     while (!(b == '\r' && c == '\n')) {
+    //         bStream.write(b);
+    //         b = c;
+    //         c = input.read();
+    //              }
+    //     System.out.println(bStream.toString());
+    //     return bStream.toString();
+    // }
 
     /**
      * this function start the server on the server's port number.
@@ -87,19 +101,17 @@ public class Server {
             try{
                 Socket ClientSocket = this.serverSocket.accept();
                 print("Connection from: " + ClientSocket.getInetAddress() + " established.");
-                //InputStream s_input = ClientSocket.getInputStream();
+                // InputStream s_input = ClientSocket.getInputStream();
                 OutputStream s_output = ClientSocket.getOutputStream();
 
-                // String line = readLineOfBytes(s_input);
-                // while(!line.equals("")) {
+                // print("");
+                // String line;
+                // do {
                 //     line = readLineOfBytes(s_input);
-                // }
+                // } while (!line.equals(""));
 
-                Response r = new Response();
-                //s_output.write(r.toByteArray());
+                Response r = new Response(); //TODO: DELETE
                 r.printResponseInfo();
-                // print(Arrays.toString(r.toByteArray()));
-                // byte[] b = {46, 45};
                 s_output.write(r.toByteArray());
                 // s_output.flush();
 

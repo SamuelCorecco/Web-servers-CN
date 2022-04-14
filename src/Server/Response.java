@@ -1,8 +1,8 @@
 package Server;
 
 import java.io.IOException;
-import java.nio.file.*;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -14,7 +14,7 @@ public class Response {
 
     private enum ResponseHeader {
         STATUS(""),DATE("Date: "),SERVER("Server: "),CLEN("Content-Length: "),
-        CTYPE("Content-Type: "),CLOC("Content-Location: "),BODY("");
+        CTYPE("Content-Type: "),CLOC("Content-Location: ");
         private final String s;
         private ResponseHeader(String s) {this.s = s;};
         public String getHeader() {return this.s;}
@@ -23,7 +23,7 @@ public class Response {
     private enum StatusCode {
         OK("200 OK"),CREATED("201 Created"),NO_CONTENT("204 No Content"),
         BAD_REQUEST("400 Bad Request"),FORBIDDEN("403 Forbidden"),NOT_FOUND("404 Not Found"),
-        METHOD_NOT_ALLOWED("405 Method Not Allowed"),NOT_IMPLEMENTED("501 Not Implemented"),
+        METHOD_NOT_ALLOWED("405 Method Not Allowed"),INTERNAL_SERVER_ERROR("500 Internal Server Error"),NOT_IMPLEMENTED("501 Not Implemented"),
         BAD_GATEWAY("502 Bad Gateway");
         private final String s;
         private StatusCode(String s) {this.s = s;}
@@ -31,32 +31,35 @@ public class Response {
     }
 
     private LinkedHashMap<ResponseHeader, String> headers;
+    private byte[] body;
     private final Request request;
     private final Server server;
+    private boolean isLast; 
 
-     // Dummy constructor to test responses
+     // TODO: DELETE Dummy constructor to test responses
     public Response() throws Exception {
+        this.isLast = true;
         this.server = new Server(8080);
-        Request q = new Request(this.server);
-        q.setVersion("HTTP/1.0");
-        q.setMethod("GET");
-        q.setURL("/");
-        q.setHost("samuelcorecco.ch");
-        this.request = q;
+        Request req = new Request(this.server);
+        req.setVersion("HTTP/1.0");
+        req.setMethod("GET");
+        req.setURL("/");
+        req.setHost("samuelcorecco.ch");
+        this.request = req;
         headers = new LinkedHashMap<>();
-        addStatus(StatusCode.OK);
-        addDate();
-        addServer();
-        String body = "The administrator of guyincognito.ch is Guy Incognito.\n" + 
-                        "You can contact him at guy.incognito@usi.ch.";
-        addBody(body, "text/plain");
-
         handle();
     }
 
-    public Response(Request req, Server s) {
+    /**
+     * Creates a new Response for the given Server and Request, AND handles it, ie, it is
+     * populated with the correct information to then turn it into a byte array.
+     * @param s server
+     * @param req request
+     */
+    public Response(Server s, Request req, boolean isLast) {
         this.server = s;
         this.request = req;
+        this.isLast = isLast;
         headers = new LinkedHashMap<>();
         handle();
     }
@@ -105,11 +108,11 @@ public class Response {
      * Used: GET
      * @param body message to answer to client
      */
-    private void addBody(String body, String ctype) {
-        String len = Integer.toString(body.length());
+    private void addBody(byte[] body, String ctype) {
+        String len = Integer.toString(new String(body).length());
         headers.put(ResponseHeader.CLEN, len);
         headers.put(ResponseHeader.CTYPE, ctype);
-        headers.put(ResponseHeader.BODY, body);
+        this.body = body;
     }
 
     /**
@@ -160,80 +163,28 @@ public class Response {
             request_resource =  server.getEntryPoint(request_host);
         }
         String filePath = request_host + "/" + request_resource;
-        //print("filepath is: " + filePath);
 
-        //print(filePath);
+        print("");
+        print("requested: " + filePath);
 
-        Path path = Paths.get(filePath);
-        if(Files.exists(path)) {
-            if(isValidGetResource(path)) {
+        if(FileHandler.checkFileExists(request_host, request_resource)) {
+            try {
+                byte[] content = FileHandler.getFileContent(request_host, request_resource);
                 addStatus(StatusCode.OK);
                 addDate();
                 addServer();
-                String ext = getFileExtension(request_resource);
-                addBody(getFileContent(path), ext);
-            } else {
-                // TODO: not a valid resource to return
+                String ctype = FileHandler.getMimeType(request_resource);
+                addBody(content, ctype);
+            } catch (IOException e) {
+                // Something went wrong when reading the file
+                print("Something went wrong when reading the file");
+                addStatus(StatusCode.INTERNAL_SERVER_ERROR);
             }
         } else {
-            print("Cannot serve " + filePath + " to client");
+            print("Cannot serve " + filePath + " to client because it DNE");
             addStatus(StatusCode.NOT_FOUND);
         }
         print("");
-    }
-
-    /**
-     * Checks whether a given path contains a resource that's allowed to be returned by
-     * a GET request.
-     */
-    private boolean isValidGetResource(Path path) {
-        // TODO: Should check if resource is valid
-        return true;
-    }
-
-    /**
-     * Returns the file's extension and its corresponding HTTP content-type.
-     * @return a file's extension (0) and content-type (1)
-     */
-    private String getFileExtension(String fileName) {
-        final String ext = fileName.split("\\.")[1];
-        FileHandler fileHandler = new  FileHandler();
-        return fileHandler.extensionToMimeType(ext);
-        /*
-        String ctype;
-        switch (ext) {
-            case "html":
-                ctype = "text/html";
-                break;
-            case "css":
-                ctype = "text/css";
-                break;
-            case "jpg":
-            case "jpeg":
-                ctype = "image/jpeg";
-                break;
-            case "png":
-                ctype = "image/png";
-            default:
-                ctype = "text/plain";
-                break;
-        }
-        return ctype;*/
-    }
-
-    /**
-     * Returns the contents of an HTML file in String format.
-     * @param path the par
-     * @return text inside HTML file
-     */
-    private String getFileContent(Path path){
-        String body = "";
-        try {
-            body = Files.readString(path);
-        } catch (IOException e) {
-            error("Something went wrong reading " + path.getFileName());
-        }
-        return body;
     }
 
     /**
@@ -256,7 +207,12 @@ public class Response {
      * @return byte array of HTTP response
      */
     public byte[] toByteArray() {
-        return responseToString().getBytes();
+        String str = responseToString() + "\r\n";
+        byte[] content = str.getBytes();
+        // array concat: https://stackoverflow.com/questions/80476/how-can-i-concatenate-two-arrays-in-java
+        byte[] both = Arrays.copyOf(content, content.length + this.body.length);
+        System.arraycopy(body, 0, both, content.length, body.length);
+        return both;   
     }
 
     /**
@@ -270,26 +226,28 @@ public class Response {
      * Convert the Response object to a well formatted string.
      * @return response in string format
      */
-    public String responseToString() {
+    private String responseToString() {
         String response = "";
         for(ResponseHeader h : headers.keySet()) {
             String line = h.getHeader() +  headers.get(h) + "\r\n";
-            if(h == ResponseHeader.BODY) {
-                line = "\r\n" + line; // CRLF
-            }
             response += line;
+        }
+        boolean isImage = headers.get(ResponseHeader.CTYPE).startsWith("image");
+        if(!isImage) {
+            response += "\r\n" + new String(this.body);
         }
         return response;
     }
 
-    //TODO: implementare il fatto che ritorna lo stato in stringa
-    public String getStatusString(){
-        return "TODO";
+    /**
+     * Checks whether this response is the last one
+     * @return if response is the last or not
+     */
+    public boolean getIsLast() {
+        return this.isLast;
     }
 
-    //TODO: implementare un parametro che dica se il messaggio è l'ultimo
-    public Boolean getIsLast(){
-        //EX return this.last
-        return true;
+    public String getStatusString() {
+        return headers.get(ResponseHeader.STATUS);
     }
 }

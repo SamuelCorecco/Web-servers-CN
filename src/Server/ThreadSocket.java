@@ -33,8 +33,8 @@ public class ThreadSocket implements Runnable{
                 byte[] body = in.readNBytes(request.getContentLength());
                 request.setBody(body);
             }
-            response = new Response(request,server); 
-            out.write(response.responseToString().getBytes());
+            response = new Response(server,request, true); 
+            out.write(response.toByteArray());
             out.flush();
             System.out.println(response.getStatusString() + " " + request.getMethod() + " " +request.getURL() + " " + request.getVersion());//TODO getStatus for respons
         } while (!response.getIsLast()); //TODO implement method isLast
