@@ -37,8 +37,8 @@ public class ThreadSocket implements Runnable{
             out.write(response.toByteArray());
             out.flush();
             System.out.println(response.getStatusString() + " " + request.getMethod() + " " +request.getURL() + " " + request.getVersion());//TODO getStatus for respons
-        } while (!response.getIsLast()); //TODO implement method isLast
-        socket.close(); //
+        } while (!response.getIsLast() || request.getVersion().equals("HTTP/1.0")); 
+        socket.close(); 
     }
 
     private String readByteStream(InputStream in) throws IOException {

@@ -2,6 +2,7 @@ package src.Server;
 
 import java.util.HashMap;
 import java.util.Optional;
+import static src.Server.Print.*;
 
 public class Request {
     private final String[] validHeaders = {
@@ -159,7 +160,8 @@ public class Request {
         if (headerLines.get("Content-Length") == null) {
             return -1;
         } else {
-            return Integer.parseInt(headerLines.get("Content-Length"));
+            int len = Integer.parseInt(headerLines.get("Content-Length"));
+            return len;
         }
     }
 
@@ -205,6 +207,10 @@ public class Request {
      */
 
     public void setBody(byte[] body) {
+        // TODO: Delete everything except last line
+        this.headerLines.put("Content-Type", "text/html"); // TODO: handle other types
+        String len = Integer.toString(new String(body).length());
+        this.headerLines.put("Content-Length", len);
         this.body = body;
     }
 

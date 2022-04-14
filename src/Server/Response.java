@@ -1,6 +1,6 @@
 package src.Server;
 
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -42,9 +42,11 @@ public class Response {
         this.server = new Server(8080);
         Request req = new Request(this.server);
         req.setVersion("HTTP/1.0");
-        req.setMethod("GET");
-        req.setURL("/");
+        req.setMethod("PUT");
+        req.setURL("/newfile.html");
         req.setHost("samuelcorecco.ch");
+        String reqbodystring = new String("<html><body><h1>Hello!</h1></body></html>");
+        req.setBody(reqbodystring.getBytes());
         this.request = req;
         headers = new LinkedHashMap<>();
         handle();
@@ -119,8 +121,8 @@ public class Response {
      * Add content location header
      * Used: PUT
      */
-    private void addContentLocation() {
-        // TODO
+    private void addContentLocation(String path) {
+        headers.put(ResponseHeader.CLOC, path);
     }
         
 
@@ -186,21 +188,68 @@ public class Response {
      * Handles a PUT request.
      */
     private void answerPut() {
-        //TODO
         String request_host = this.request.getHost();
         String request_resource = this.request.getURL();
         if(request_resource == "/") {
             request_resource =  server.getEntryPoint(request_host);
         }
-        String filePath = request_host + "/" + request_resource;
+
+        // get body up to character # specified in length and read
+        byte[] body = Arrays.copyOfRange(this.request.getBody(), 0, this.request.getContentLength());
+
+        if(FileHandler.checkFileExists(request_host, request_resource)) {
+            // update (ie delete + add)
+            try {
+                FileHandler.deleteFile(request_host, request_resource);
+                FileHandler.createFile(request_host, request_resource, body);
+                addStatus(StatusCode.NO_CONTENT); // 204
+            } catch (IOException e) {
+                print("Something went wrong when updating the file " + request_resource);
+                addStatus(StatusCode.INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            // create new file
+            try {
+                FileHandler.createFile(request_host, request_resource, body);
+                addStatus(StatusCode.CREATED); // 201
+                addContentLocation(request_resource); 
+            } catch (IOException e) {
+                print("Something went wrong when creating the file " + request_resource);
+                addStatus(StatusCode.INTERNAL_SERVER_ERROR);
+            }
+        }
     }
 
+    /**
+     * Handles a DELETE request
+     */
     private void answerDelete() {
-        //TODO
+       if (FileHandler.checkFileExists(request.getHost(), request.getURL())) {
+           try {
+               FileHandler.deleteFile(request.getHost(), request.getURL());
+               addStatus(StatusCode.NO_CONTENT);
+           } catch (FileNotFoundException e) {
+               print("The file has not been found");
+               addStatus(StatusCode.NOT_FOUND);
+           }   
+       };
     }
 
+    /**
+     * Handles the NTW22INFO request
+     */
     private void answerNTW22INFO() {
-        //TODO
+        if (server.getDomains().checkHostExists(request.getHost()) != -1) {
+            addStatus(StatusCode.OK);
+            addDate();
+            addServer();
+            String bodyContent = "The administrator of " + request.getHost() + "is " + server.getDomains().getMemberName(request.getHost()) + ".\n"
+            + "You can contact him at " + server.getDomains().getMemberEmail(request.getHost()) + ".";
+            byte[] body = bodyContent.getBytes();
+            addBody(body, "text/plain");
+        } else {
+
+        }
     }
 
     /**
@@ -211,8 +260,11 @@ public class Response {
         String str = responseToString() + "\r\n";
         byte[] content = str.getBytes();
         // array concat: https://stackoverflow.com/questions/80476/how-can-i-concatenate-two-arrays-in-java
-        byte[] both = Arrays.copyOf(content, content.length + this.body.length);
-        System.arraycopy(body, 0, both, content.length, body.length);
+        byte[] both = content;
+        if(this.body != null) {
+            both = Arrays.copyOf(content, content.length + this.body.length);
+            System.arraycopy(body, 0, both, content.length, body.length);
+        }
         return both;   
     }
 
@@ -233,8 +285,8 @@ public class Response {
             String line = h.getHeader() +  headers.get(h) + "\r\n";
             response += line;
         }
-        boolean isImage = headers.get(ResponseHeader.CTYPE).startsWith("image");
-        if(!isImage) {
+        String ctype = headers.get(ResponseHeader.CTYPE);
+        if(ctype != null && !ctype.startsWith("image")) {
             response += "\r\n" + new String(this.body);
         }
         return response;
@@ -247,7 +299,11 @@ public class Response {
     public boolean getIsLast() {
         return this.isLast;
     }
-
+    
+    /**
+     * Get the response's status (version + status code)
+     * @return response status as a string
+     */
     public String getStatusString() {
         return headers.get(ResponseHeader.STATUS);
     }
